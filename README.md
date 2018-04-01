@@ -1,7 +1,14 @@
 # Scene View Handles
-SVHandles is a lightweight extension for Unity which allows you to quickly visualize debug information such as raycasts and points in space by simply adding one attribute to the variable, and nothing else. Say you had a point in space in your code that you'd like to debug. Having to go through and add an ``OnDrawGizmos()`` method, then finally add your code is a long process in comparison to just adding ``[SVDebug]`` right over your variable. SVHandles allows you to easily preview types within Unity, and even allows for you to extend it with your own custom types.
+SVHandles is a lightweight extension for Unity which allows you to quickly visualize and modify variables such as Vector3 and Bounds by simply adding ``[SVHandle]`` to the variable, and nothing else. It also allows you to quickly preview variables in the editor as well with ``[SVDebug]``
 
-## Example
+## SVHandle Example
+The Following code produces this visual:
+![Handle Example](https://i.imgur.com/rhgZPXB.gif)
+```cs
+    [SVHandle]
+    public Vector3 MyPoint = new Vector3(0, 10, 0);```
+
+## SVDebug Example
 ```cs
 public class TestInstance : MonoBehaviour
 {
@@ -48,6 +55,7 @@ So let's say you had some custom type you use often, that you would like to debu
         }
     }
 ```
+This is the same for SVHandles as well, except you have the option to return an ``object`` value.
 
 ## Installation
 To install SVHandles, simply go to the releases tab above, download the .dll, and place it within your project! If you would like, you can also clone the entire repository for personal development purposes, or if you happen to have a childhood fear of .dll's.
