@@ -48,3 +48,6 @@ So let's say you had some custom type you use often, that you would like to debu
         }
     }
 ```
+
+## Side-Note
+If you do decide to extend SceneViewHandles, it would be greatly appreciated if you could copy your display code into a PullRequest to make things better for everyone, I'm only one person, so I can't think of everything! (Same goes for posting issues if you see something wrong, we're all here to improve.)
