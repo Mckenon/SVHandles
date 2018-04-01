@@ -63,7 +63,7 @@ internal static class SceneViewHandles
 
                 DrawDebugArgs args = new DrawDebugArgs(value, attrib.MonoInstance);
 
-                Handles.color = attrib.DrawDebugAttributes[attrib.Fields.IndexOf(field)].Color;
+                Handles.color = attrib.SVDebugAttributes[attrib.Fields.IndexOf(field)].Color;
 
                 // Run a display method from an instance of ITypeDisplay, using our type as an index in the dictionary.
                 Displays[type].Draw(args);
@@ -125,7 +125,7 @@ internal static class SceneViewHandles
             // See if this component has any fields with our attribute
             FieldInfo[] fields = monoType.GetFields(BindingFlags.Instance | BindingFlags.Public);
 
-            bool hasDebugAttrib = fields.Any(field => Attribute.GetCustomAttribute(field, typeof(DrawDebug)) is DrawDebug);
+            bool hasDebugAttrib = fields.Any(field => Attribute.GetCustomAttribute(field, typeof(SVDebug)) is SVDebug);
             if (!hasDebugAttrib)
                 continue;
 
@@ -134,15 +134,15 @@ internal static class SceneViewHandles
 
             foreach (var field in fields)
             {
-                DrawDebug drawDebugAttrib = Attribute.GetCustomAttribute(field, typeof(DrawDebug)) as DrawDebug;
+                SVDebug svDebugAttrib = Attribute.GetCustomAttribute(field, typeof(SVDebug)) as SVDebug;
 
-                if (drawDebugAttrib == null)
+                if (svDebugAttrib == null)
                     continue;
 
                 if (!attrib.Fields.Contains(field))
                     attrib.Fields.Add(field);
-                if (!attrib.DrawDebugAttributes.Contains(drawDebugAttrib))
-                    attrib.DrawDebugAttributes.Add(drawDebugAttrib);
+                if (!attrib.SVDebugAttributes.Contains(svDebugAttrib))
+                    attrib.SVDebugAttributes.Add(svDebugAttrib);
             }
         }
     }
@@ -172,13 +172,13 @@ internal static class SceneViewHandles
     {
         public MonoBehaviour MonoInstance;
         public List<FieldInfo> Fields;
-        public List<DrawDebug> DrawDebugAttributes;
+        public List<SVDebug> SVDebugAttributes;
 
         public AttributeInstance(MonoBehaviour mono)
         {
             MonoInstance = mono;
             Fields = new List<FieldInfo>();
-            DrawDebugAttributes = new List<DrawDebug>();
+            SVDebugAttributes = new List<SVDebug>();
         }
     }
 

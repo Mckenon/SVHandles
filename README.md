@@ -1,17 +1,17 @@
-# SceneViewHandles
-SceneViewHandles is a lightweight extension for Unity which allows you to quickly visualize debug information such as raycasts and points in space by simply adding one attribute to the variable, and nothing else. Say you had a point in space in your code that you'd like to debug. Having to go through and add an ``OnDrawGizmos()`` method, then finally add your code is a long process in comparison to just adding ``[DrawDebug]`` right over your variable. SceneViewHandles allows you to easily preview types within Unity, and even allows for you to extend it with your own custom types.
+# Scene View Handles
+SVHandles is a lightweight extension for Unity which allows you to quickly visualize debug information such as raycasts and points in space by simply adding one attribute to the variable, and nothing else. Say you had a point in space in your code that you'd like to debug. Having to go through and add an ``OnDrawGizmos()`` method, then finally add your code is a long process in comparison to just adding ``[SVDebug]`` right over your variable. SVHandles allows you to easily preview types within Unity, and even allows for you to extend it with your own custom types.
 
 ## Example
 ```cs
 public class TestInstance : MonoBehaviour
 {
-    [DrawDebug(0f, 1f, 0f)]
+    [SVDebug(0f, 1f, 0f)]
     public Vector3 MyPoint = new Vector3(0, 10, 0);
 
-    [DrawDebug(1f, 0f, 0f)]
+    [SVDebug(1f, 0f, 0f)]
     public Vector3 TestDynamic = new Vector3(0, 10, 10);
 
-    [DrawDebug]
+    [SVDebug]
     public Ray TestRay = new Ray(new Vector3(0, 0, 0), Vector3.forward);
 
     private float t = 0f;
@@ -28,7 +28,7 @@ This code example produces the following visual:
 and, animated: https://streamable.com/q1v66
 
 ## Extendability
-So let's say you had some custom type you use often, that you would like to debug with this as well. That's easy, all you need to do is have a class in your project which implements ``ITypeDisplay``. For reference, here is how the code looks for drawing a ``Ray`` in ``DrawDebug``.
+So let's say you had some custom type you use often, that you would like to debug with this as well. That's easy, all you need to do is have a class in your project which implements ``ITypeDisplay``. For reference, here is how the code looks for drawing a ``Ray`` in ``SVDebug``.
 ```cs
     public class RayDisplay : ITypeDisplay
     {
@@ -37,7 +37,7 @@ So let's say you had some custom type you use often, that you would like to debu
             get { return typeof(Ray); }
         }
 
-        public void Draw(DrawDebugArgs args)
+        public void Draw(SVDebugArgs args)
         {
             Ray? ray = args.Value as Ray?;
 
@@ -53,4 +53,4 @@ So let's say you had some custom type you use often, that you would like to debu
 To install SVHandles, simply go to the releases tab above, download the .dll, and place it within your project! If you would like, you can also clone the entire repository for personal development purposes, or if you happen to have a childhood fear of .dll's.
 
 ## Side-Note
-If you do decide to extend SceneViewHandles, it would be greatly appreciated if you could copy your display code into a PullRequest to make things better for everyone, I'm only one person, so I can't think of everything! (Same goes for posting issues if you see something wrong, we're all here to improve.)
+If you do decide to extend SVHandles, it would be greatly appreciated if you could copy your display code into a PullRequest to make things better for everyone, I'm only one person, so I can't think of everything! (Same goes for posting issues if you see something wrong, we're all here to improve.)
