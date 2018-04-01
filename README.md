@@ -11,24 +11,21 @@ The Following code produces this visual:
 
 ## SVDebug Example
 ```cs
-public class TestInstance : MonoBehaviour
+[SVDebug(0f, 1f, 0f)]
+public Vector3 MyPoint = new Vector3(0, 10, 0);
+
+[SVDebug(1f, 0f, 0f)]
+public Vector3 TestDynamic = new Vector3(0, 10, 10);
+
+[SVDebug]
+public Ray TestRay = new Ray(new Vector3(0, 0, 0), Vector3.forward);
+
+private float t = 0f;
+private void Update()
 {
-    [SVDebug(0f, 1f, 0f)]
-    public Vector3 MyPoint = new Vector3(0, 10, 0);
-
-    [SVDebug(1f, 0f, 0f)]
-    public Vector3 TestDynamic = new Vector3(0, 10, 10);
-
-    [SVDebug]
-    public Ray TestRay = new Ray(new Vector3(0, 0, 0), Vector3.forward);
-
-    private float t = 0f;
-    private void Update()
-    {
-        t += Time.deltaTime;
-        TestDynamic = new Vector3(Mathf.Cos(t) * 1f, 0, Mathf.Sin(t) * 1f);
-        TestRay.direction = (TestDynamic).normalized;
-    }
+	t += Time.deltaTime;
+	TestDynamic = new Vector3(Mathf.Cos(t) * 1f, 0, Mathf.Sin(t) * 1f);
+	TestRay.direction = (TestDynamic).normalized;
 }
 ```
 This code example produces the following visual:  
@@ -38,23 +35,23 @@ and, animated: https://streamable.com/q1v66
 ## Extendability
 So let's say you had some custom type you use often, that you would like to debug with this as well. That's easy, all you need to do is have a class in your project which implements ``ITypeDisplay``. For reference, here is how the code looks for drawing a ``Ray`` in ``SVDebug``.
 ```cs
-    public class RayDisplay : ITypeDisplay
-    {
-        public Type ExecutingType
-        {
-            get { return typeof(Ray); }
-        }
+public class RayDisplay : ITypeDisplay
+{
+	public Type ExecutingType
+	{
+		get { return typeof(Ray); }
+	}
 
-        public void Draw(SVDebugArgs args)
-        {
-            Ray? ray = args.Value as Ray?;
+	public void Draw(SVDebugArgs args)
+	{
+		Ray? ray = args.Value as Ray?;
 
-            if (ray == null)
-                return;
+		if (ray == null)
+			return;
 
-            Handles.ArrowHandleCap(0, ray.Value.origin, Quaternion.LookRotation(ray.Value.direction), 1f, EventType.Repaint);
-        }
-    }
+		Handles.ArrowHandleCap(0, ray.Value.origin, Quaternion.LookRotation(ray.Value.direction), 1f, EventType.Repaint);
+	}
+}
 ```
 This is the same for SVHandles as well, except you have the option to return an ``object`` value.
 
