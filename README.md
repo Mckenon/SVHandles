@@ -6,7 +6,8 @@ The Following code produces this visual:
 ![Handle Example](https://i.imgur.com/rhgZPXB.gif)
 ```cs
     [SVHandle]
-    public Vector3 MyPoint = new Vector3(0, 10, 0);```
+    public Vector3 MyPoint = new Vector3(0, 10, 0);
+```
 
 ## SVDebug Example
 ```cs
