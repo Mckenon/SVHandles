@@ -3,11 +3,11 @@ SVHandles is a lightweight extension for Unity which allows you to quickly visua
 
 ## SVHandle Example
 The Following code produces this visual:
-![Handle Example](https://i.imgur.com/rhgZPXB.gif)
 ```cs
     [SVHandle]
     public Vector3 MyPoint = new Vector3(0, 10, 0);
 ```
+![Handle Example](https://i.imgur.com/rhgZPXB.gif)
 
 ## SVDebug Example
 ```cs
