@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-public struct DrawDebugArgs
+public struct SVArgs
 {
     public MonoBehaviour MonoInstance;
     public object Value;
 
-    public DrawDebugArgs(object value, MonoBehaviour monoInstance)
+    public SVArgs(object value, MonoBehaviour monoInstance)
     {
         Value = value;
         MonoInstance = monoInstance;

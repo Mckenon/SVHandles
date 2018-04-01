@@ -9,10 +9,11 @@ using Object = UnityEngine.Object;
 
 internal static class SceneViewHandles
 {
-    private const float UPDATE_TIME = 5f;                   // Value used to periodically update our attributes.
-    private static float t = 0f;                            // Value used to keep track of time between updates.
-    private static List<AttributeInstance> Attributes;      // A list of attribute instances we keep cached for re-use.
-    private static Dictionary<Type, ITypeDisplay> Displays; // Dictionary full of display methods for various types, loaded via reflection.
+    private const float UPDATE_TIME = 5f;                               // Value used to periodically update our attributes.
+    private static float t = 0f;                                        // Value used to keep track of time between updates.
+    private static List<AttributeInstance> attributes;                  // A list of attribute instances we keep cached for re-use.
+    private static Dictionary<Type, ITypeDebugDisplay> debugDisplays;   // Dictionary full of display methods for various types, loaded via reflection.
+    private static Dictionary<Type, ITypeHandleDisplay> handleDisplays; // Dictionary full of handle methods for various types
 
     [InitializeOnLoadMethod]
     private static void Init()
@@ -29,44 +30,77 @@ internal static class SceneViewHandles
 
     private static void OnSceneGUI(SceneView sceneView)
     {
-        if (Attributes == null)
+        if (attributes == null)
             SweepForComponents();
 
-        for(int i = Attributes.Count; i --> 0;)
+        for(int i = attributes.Count; i --> 0;)
         {
-            var attrib = Attributes[i];
+            var attrib = attributes[i];
 
             // If there is no mono instance, assume our component has been removed.
             if (attrib.MonoInstance == null)
             {
-                Attributes.Remove(attrib);
+                attributes.Remove(attrib);
                 continue;
             }
 
-            // Go through each field, and draw whatever visual the type requires.
-            foreach (var field in attrib.Fields)
+            // TODO - Do something to make this not be mostly two copied code blocks.
+
+            // Draw our SVDebugs
+            foreach (var kvPair in attrib.SVDebugs)
             {
-                object value = field.GetValue(attrib.MonoInstance);
-                Type type = field.FieldType;
+                object value = kvPair.Key.GetValue(attrib.MonoInstance);
+                Type type = kvPair.Key.FieldType;
 
                 if (value == null)
                 {
-                    Attributes.Remove(attrib);
+                    attributes.Remove(attrib);
                     break;
                 }
 
-                if (!Displays.ContainsKey(type))
+                if (!debugDisplays.ContainsKey(type))
                 {
                     Debug.LogWarning("Attempt to draw debug for a type which doesn't have a ITypeDisplay.\nPerhaps you should add one?");
                     continue;
                 }
 
-                DrawDebugArgs args = new DrawDebugArgs(value, attrib.MonoInstance);
+                SVArgs args = new SVArgs(value, attrib.MonoInstance);
 
-                Handles.color = attrib.SVDebugAttributes[attrib.Fields.IndexOf(field)].Color;
+                Handles.color = attrib.SVDebugs[kvPair.Key].Color;
 
                 // Run a display method from an instance of ITypeDisplay, using our type as an index in the dictionary.
-                Displays[type].Draw(args);
+                debugDisplays[type].Draw(args);
+            }
+
+            // Draw our SVDebugs
+            foreach (var kvPair in attrib.SVHandles)
+            {
+                object value = kvPair.Key.GetValue(attrib.MonoInstance);
+                Type type = kvPair.Key.FieldType;
+
+                if (value == null)
+                {
+                    attributes.Remove(attrib);
+                    break;
+                }
+
+                if (!handleDisplays.ContainsKey(type))
+                {
+                    Debug.LogWarning("Attempt to draw debug for a type which doesn't have a ITypeDisplay.\nPerhaps you should add one?");
+                    continue;
+                }
+
+                SVArgs args = new SVArgs(value, attrib.MonoInstance);
+
+                Handles.color = attrib.SVHandles[kvPair.Key].Color;
+
+                // Run a display method from an instance of ITypeDisplay, using our type as an index in the dictionary.
+                object outValue = null;
+                handleDisplays[type].Draw(args, out outValue);
+
+                // We allow for null checking here so that you can micro-optimize away the call to SetValue if there are no changes.
+                if (outValue != null)
+                    kvPair.Key.SetValue(attrib.MonoInstance, outValue);
             }
         }
     }
@@ -102,8 +136,8 @@ internal static class SceneViewHandles
     {
         if (change != PlayModeStateChange.EnteredEditMode) return;
         // Force refresh our components
-        Attributes.Clear();
-        Displays.Clear();
+        attributes.Clear();
+        debugDisplays.Clear();
         SweepForComponents();
         LoadDisplaysViaReflection();
     }
@@ -114,8 +148,8 @@ internal static class SceneViewHandles
     /// </summary>
     private static void SweepForComponents()
     {
-        if (Attributes == null)
-            Attributes = new List<AttributeInstance>();
+        if (attributes == null)
+            attributes = new List<AttributeInstance>();
 
         MonoBehaviour[] activeScene = Object.FindObjectsOfType<MonoBehaviour>();
         foreach (MonoBehaviour mono in activeScene)
@@ -125,7 +159,7 @@ internal static class SceneViewHandles
             // See if this component has any fields with our attribute
             FieldInfo[] fields = monoType.GetFields(BindingFlags.Instance | BindingFlags.Public);
 
-            bool hasDebugAttrib = fields.Any(field => Attribute.GetCustomAttribute(field, typeof(SVDebug)) is SVDebug);
+            bool hasDebugAttrib = fields.Any(field => Attribute.GetCustomAttribute(field, typeof(SVDebug)) is SVDebug || Attribute.GetCustomAttribute(field, typeof(SVHandle)) is SVHandle);
             if (!hasDebugAttrib)
                 continue;
 
@@ -135,14 +169,14 @@ internal static class SceneViewHandles
             foreach (var field in fields)
             {
                 SVDebug svDebugAttrib = Attribute.GetCustomAttribute(field, typeof(SVDebug)) as SVDebug;
+                SVHandle svHandleAttrib = Attribute.GetCustomAttribute(field, typeof(SVHandle)) as SVHandle;
 
-                if (svDebugAttrib == null)
-                    continue;
-
-                if (!attrib.Fields.Contains(field))
-                    attrib.Fields.Add(field);
-                if (!attrib.SVDebugAttributes.Contains(svDebugAttrib))
-                    attrib.SVDebugAttributes.Add(svDebugAttrib);
+                if (svDebugAttrib != null)
+                    if (!attrib.SVDebugs.ContainsKey(field))
+                        attrib.SVDebugs.Add(field, svDebugAttrib);
+                if(svHandleAttrib != null)
+                    if (!attrib.SVHandles.ContainsKey(field))
+                        attrib.SVHandles.Add(field, svHandleAttrib);
             }
         }
     }
@@ -155,11 +189,11 @@ internal static class SceneViewHandles
     /// <returns></returns>
     private static AttributeInstance GetOrCreateAttributeInstance(MonoBehaviour mono)
     {
-        foreach(var attrib in Attributes)
+        foreach(var attrib in attributes)
             if (attrib.MonoInstance == mono)
                 return attrib;
         var newAttrib = new AttributeInstance(mono);
-        Attributes.Add(newAttrib);
+        attributes.Add(newAttrib);
         return newAttrib;
     }
 
@@ -171,14 +205,14 @@ internal static class SceneViewHandles
     private class AttributeInstance
     {
         public MonoBehaviour MonoInstance;
-        public List<FieldInfo> Fields;
-        public List<SVDebug> SVDebugAttributes;
+        public Dictionary<FieldInfo, SVDebug> SVDebugs;
+        public Dictionary<FieldInfo, SVHandle> SVHandles;
 
         public AttributeInstance(MonoBehaviour mono)
         {
             MonoInstance = mono;
-            Fields = new List<FieldInfo>();
-            SVDebugAttributes = new List<SVDebug>();
+            SVDebugs = new Dictionary<FieldInfo, SVDebug>();
+            SVHandles = new Dictionary<FieldInfo, SVHandle>();
         }
     }
 
@@ -188,14 +222,15 @@ internal static class SceneViewHandles
     /// </summary>
     private static void LoadDisplaysViaReflection()
     {
-        Type[] displayTypes = AppDomain.CurrentDomain.GetAssemblies()
+        debugDisplays = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(t => t.GetTypes())
-            .Where(t => t.IsClass && typeof(ITypeDisplay).IsAssignableFrom(t)).ToArray();
-        Displays = new Dictionary<Type, ITypeDisplay>();
-        foreach (var dispType in displayTypes)
-        {
-            ITypeDisplay displayInstance = (ITypeDisplay) Activator.CreateInstance(dispType);
-            Displays.Add(displayInstance.ExecutingType, displayInstance);
-        }
+            .Where(t => t.IsClass && typeof(ITypeDebugDisplay).IsAssignableFrom(t))
+            .Select(t => (ITypeDebugDisplay) Activator.CreateInstance(t))
+            .ToDictionary(t => t.ExecutingType, t => t);
+        handleDisplays = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(t => t.GetTypes())
+            .Where(t => t.IsClass && typeof(ITypeHandleDisplay).IsAssignableFrom(t))
+            .Select(t => (ITypeHandleDisplay)Activator.CreateInstance(t))
+            .ToDictionary(t => t.ExecutingType, t => t);
     }
 }

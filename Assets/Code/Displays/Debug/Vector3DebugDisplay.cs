@@ -6,14 +6,14 @@ using UnityEngine;
 
 namespace SVHandles.Displays
 {
-    public class Vector3Display : ITypeDisplay
+    public class Vector3DebugDisplay : ITypeDebugDisplay
     {
         public Type ExecutingType
         {
             get { return typeof(Vector3); }
         }
 
-        public void Draw(DrawDebugArgs args)
+        public void Draw(SVArgs args)
         {
             Vector3? mVec = args.Value as Vector3?;
 

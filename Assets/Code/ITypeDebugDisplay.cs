@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface ITypeDisplay
+public interface ITypeDebugDisplay
 {
     /// <summary>
     /// The type which this Display will work for.
     /// </summary>
     Type ExecutingType { get; }
-    void Draw(DrawDebugArgs args);
+    void Draw(SVArgs args);
 }

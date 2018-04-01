@@ -4,16 +4,16 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace SVHandles.Displays
+namespace SVHandles.Displays.Debug
 {
-    public class RayDisplay : ITypeDisplay
+    public class RayDebugDisplay : ITypeDebugDisplay
     {
         public Type ExecutingType
         {
             get { return typeof(Ray); }
         }
 
-        public void Draw(DrawDebugArgs args)
+        public void Draw(SVArgs args)
         {
             Ray? ray = args.Value as Ray?;
 

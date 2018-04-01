@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TestInstance : MonoBehaviour
 {
-    [SVDebug(0f, 1f, 0f)]
+    [SVHandle]
     public Vector3 MyPoint = new Vector3(0, 10, 0);
 
     [SVDebug(1f, 0f, 0f)]
