@@ -27,7 +27,7 @@ This code example produces the following visual:
 ![Image Example](https://i.imgur.com/nwTu0fe.png)  
 and, animated: https://streamable.com/q1v66
 
-## Extendable
+## Extendability
 So let's say you had some custom type you use often, that you would like to debug with this as well. That's easy, all you need to do is have a class in your project which implements ``ITypeDisplay``. For reference, here is how the code looks for drawing a ``Ray`` in ``DrawDebug``.
 ```cs
     public class RayDisplay : ITypeDisplay
@@ -48,6 +48,9 @@ So let's say you had some custom type you use often, that you would like to debu
         }
     }
 ```
+
+## Installation
+To install SVHandles, simply go to the releases tab above, download the .dll, and place it within your project! If you would like, you can also clone the entire repository for personal development purposes, or if you happen to have a childhood fear of .dll's.
 
 ## Side-Note
 If you do decide to extend SceneViewHandles, it would be greatly appreciated if you could copy your display code into a PullRequest to make things better for everyone, I'm only one person, so I can't think of everything! (Same goes for posting issues if you see something wrong, we're all here to improve.)
