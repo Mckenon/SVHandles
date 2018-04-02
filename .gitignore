@@ -34,4 +34,18 @@ sysinfo.txt
 *.unitypackage
 
 # Ignore the DLL
-!/[Ll]ibrary/ScriptAssemblies/SceneViewHandles.dll
+!/Library/ScriptAssemblies/*
+!/Library/ScriptAssemblies/SceneViewHandles*.dll
+Library/ScriptAssemblies/Unity\.PackageManagerUI\.Editor\.dll
+
+Library/ScriptAssemblies/Unity\.PackageManagerUI\.Editor\.dll\.mdb
+
+Library/ScriptAssemblies/UnityEditor\.StandardEvents\.dll
+
+Library/ScriptAssemblies/UnityEditor\.StandardEvents\.dll\.mdb
+
+Library/ScriptAssemblies/Assembly-CSharp\.dll
+
+Library/ScriptAssemblies/BuiltinAssemblies\.stamp
+
+Library/ScriptAssemblies/Assembly-CSharp\.dll\.mdb
