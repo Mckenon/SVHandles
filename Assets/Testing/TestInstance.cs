@@ -7,6 +7,8 @@ public class TestInstance : MonoBehaviour
     [SVHandle]
     public Vector3 MyPoint = new Vector3(0, 10, 0);
 
+    [SVHandle] public Bounds MyBounds = new Bounds(Vector3.zero, Vector3.one);
+
     [SVDebug(1f, 0f, 0f)]
     public Vector3 TestDynamic = new Vector3(0, 10, 10);
 

@@ -217,8 +217,8 @@ internal static class SceneViewHandles
     }
 
     /// <summary>
-    /// Loops through all of the current assemblies, finding every class that inherits ITypeDisplay.
-    /// Then uses Activator to create a new instance of the Type, and adds it's definition to Displays.
+    /// Loops through all of the current assemblies, finding every class that inherits ITypeDebugDisplay or ITypeHandleDisplay.
+    /// Then uses Activator to create a new instance of the Type, and adds it's definition to the corresponding dictionary.
     /// </summary>
     private static void LoadDisplaysViaReflection()
     {
