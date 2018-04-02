@@ -56,7 +56,7 @@ public class RayDisplay : ITypeDisplay
 This is the same for SVHandles as well, except you have the option to return an ``object`` value.
 
 ## Installation
-To install SVHandles, simply go to the releases tab above, download the .dll, and place it within your project! If you would like, you can also clone the entire repository for personal development purposes, or if you happen to have a childhood fear of .dll's.
+To install SVHandles, simply click this [link](https://github.com/DeathGameDev/SVHandles/raw/master/Library/ScriptAssemblies/SceneViewHandles.dll) to download the DLL, and put it in your unity project. You can also clone the entire repository if you would like to further customize the extension.
 
 ## Side-Note
 If you do decide to extend SVHandles, it would be greatly appreciated if you could copy your display code into a PullRequest to make things better for everyone, I'm only one person, so I can't think of everything! (Same goes for posting issues if you see something wrong, we're all here to improve.)
