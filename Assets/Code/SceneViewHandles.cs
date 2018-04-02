@@ -20,7 +20,7 @@ internal static class SceneViewHandles
     {
         SceneView.onSceneGUIDelegate += OnSceneGUI;
         EditorApplication.update += Update;
-        EditorApplication.hierarchyChanged += OnHierarchyChanged;
+        EditorApplication.hierarchyWindowChanged += OnHierarchyChanged;
         EditorApplication.playModeStateChanged += OnPlayStateChanged;
 
         // Load the types via reflection, because I'm a lazy dev who doesn't like typing out stuff.
