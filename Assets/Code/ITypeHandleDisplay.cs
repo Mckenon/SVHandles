@@ -9,5 +9,5 @@ public interface ITypeHandleDisplay
     /// The type which this Display will work for.
     /// </summary>
     Type ExecutingType { get; }
-    void Draw(SVArgs args, out object newValue);
+    object Draw(SVArgs args);
 }

@@ -13,13 +13,16 @@ namespace SVHandles.Displays.Handle
             get { return typeof(Vector3); }
         }
 
-        public void Draw(SVArgs args, out object obj)
+        public object Draw(SVArgs args)
         {
             Vector3 inPoint = (args.Value as Vector3?).GetValueOrDefault();
 
+            if (SceneViewHandles.DoFade(inPoint))
+                return null;
+
             Vector3 outPoint = Handles.DoPositionHandle(inPoint, Quaternion.identity);
 
-            obj = (outPoint != inPoint) ? (object)outPoint : null;
+            return (outPoint != inPoint) ? (object)outPoint : null;
         }
     }
 }

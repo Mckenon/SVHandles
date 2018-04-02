@@ -15,12 +15,15 @@ namespace SVHandles.Displays.Handle
             get { return typeof(Bounds); }
         }
 
-        public void Draw(SVArgs args, out object obj)
+        public object Draw(SVArgs args)
         {
             Transform t = args.MonoInstance.transform;
 
             Bounds inBounds = (args.Value as Bounds?).GetValueOrDefault();
             Bounds outBounds = inBounds;
+
+            if (SceneViewHandles.DoFade(t.TransformPoint(inBounds.center)))
+                return null;
 
             outBounds.center = t.InverseTransformPoint(Handles.DoPositionHandle(t.TransformPoint(inBounds.center), Quaternion.identity));
             //outBounds.size = Handles.DoScaleHandle(inBounds.size, t.TransformPoint(outBounds.center), Quaternion.identity, 1f);
@@ -50,7 +53,7 @@ namespace SVHandles.Displays.Handle
 
             Handles.DrawWireCube(t.TransformPoint(outBounds.center), outBounds.size);
 
-            obj = (outBounds != inBounds) ? (object)outBounds : null;
+            return (outBounds != inBounds) ? (object)outBounds : null;
         }
     }
 }

@@ -46,6 +46,8 @@ internal static class SceneViewHandles
 
             // TODO - Do something to make this not be mostly two copied code blocks.
 
+            Color cachedColor = Handles.color;
+
             // Draw our SVDebugs
             foreach (var kvPair in attrib.SVDebugs)
             {
@@ -72,6 +74,8 @@ internal static class SceneViewHandles
                 debugDisplays[type].Draw(args);
             }
 
+            Handles.color = cachedColor;
+
             // Draw our SVDebugs
             foreach (var kvPair in attrib.SVHandles)
             {
@@ -95,13 +99,14 @@ internal static class SceneViewHandles
                 Handles.color = attrib.SVHandles[kvPair.Key].Color;
 
                 // Run a display method from an instance of ITypeDisplay, using our type as an index in the dictionary.
-                object outValue = null;
-                handleDisplays[type].Draw(args, out outValue);
+                object outValue = handleDisplays[type].Draw(args);
 
                 // We allow for null checking here so that you can micro-optimize away the call to SetValue if there are no changes.
                 if (outValue != null)
                     kvPair.Key.SetValue(attrib.MonoInstance, outValue);
             }
+
+            Handles.color = cachedColor;
         }
     }
 
@@ -233,4 +238,55 @@ internal static class SceneViewHandles
             .Select(t => (ITypeHandleDisplay)Activator.CreateInstance(t))
             .ToDictionary(t => t.ExecutingType, t => t);
     }
+
+    #region Utilities
+
+    /// <summary>
+    /// Does fading automatically using Handles.color.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns>If the object is completely faded out, if so it is recommended that you just return.</returns>
+    public static bool DoFade(Vector3 position)
+    {
+        Color c = Handles.color;
+        float actualDist = Vector3.Distance(SceneView.currentDrawingSceneView.camera.transform.position, position);
+        float value = actualDist / fadeDistance;
+        c.a = 1-value;
+        c.a = Mathf.Max(0, c.a);
+        Handles.color = c;
+        return c.a == 0;
+    }
+    #endregion
+
+    #region Config
+
+    private static bool prefsLoaded = false;
+
+    private static float fadeDistance = 25f;
+
+    [PreferenceItem("Scene View Handles")]
+    private static void ConfigGUI()
+    {
+        if (!prefsLoaded)
+        {
+            LoadPrefs();
+            prefsLoaded = true;
+        }
+
+        fadeDistance = EditorGUILayout.Slider("Fade Distance", fadeDistance, 0f, 50f);
+
+        if (GUI.changed)
+            SavePrefs();
+    }
+
+    private static void LoadPrefs()
+    {
+        fadeDistance = EditorPrefs.GetFloat("SV_FadeDistance");
+    }
+
+    private static void SavePrefs()
+    {
+        EditorPrefs.SetFloat("SV_FadeDistance", fadeDistance);
+    }
+    #endregion
 }
