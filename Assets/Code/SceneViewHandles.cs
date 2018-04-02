@@ -44,6 +44,10 @@ internal static class SceneViewHandles
                 continue;
             }
 
+            if(displayMode == DisplayMode.SelectedObject)
+                if (!Selection.Contains(attrib.MonoInstance.gameObject))
+                    continue;
+
             // TODO - Do something to make this not be mostly two copied code blocks.
 
             Color cachedColor = Handles.color;
@@ -254,7 +258,7 @@ internal static class SceneViewHandles
         c.a = 1-value;
         c.a = Mathf.Max(0, c.a);
         Handles.color = c;
-        return c.a == 0;
+        return c.a <= 0.05f;
     }
     #endregion
 
@@ -263,6 +267,7 @@ internal static class SceneViewHandles
     private static bool prefsLoaded = false;
 
     private static float fadeDistance = 25f;
+    private static DisplayMode displayMode;
 
     [PreferenceItem("Scene View Handles")]
     private static void ConfigGUI()
@@ -275,6 +280,13 @@ internal static class SceneViewHandles
 
         fadeDistance = EditorGUILayout.Slider("Fade Distance", fadeDistance, 0f, 50f);
 
+        GUILayout.BeginHorizontal();
+        {
+            GUILayout.Label("Display Type:");
+            displayMode = (DisplayMode) GUILayout.SelectionGrid((int) displayMode, new string[] {"Selected Object", "All Objects"}, 2);
+        }
+        GUILayout.EndHorizontal();
+
         if (GUI.changed)
             SavePrefs();
     }
@@ -282,11 +294,18 @@ internal static class SceneViewHandles
     private static void LoadPrefs()
     {
         fadeDistance = EditorPrefs.GetFloat("SV_FadeDistance");
+        displayMode = (DisplayMode) EditorPrefs.GetInt("SV_DisplayMode");
     }
 
     private static void SavePrefs()
     {
         EditorPrefs.SetFloat("SV_FadeDistance", fadeDistance);
+        EditorPrefs.SetInt("SV_DisplayMode", (int)displayMode);
+    }
+
+    private enum DisplayMode
+    {
+        SelectedObject, All
     }
     #endregion
 }
