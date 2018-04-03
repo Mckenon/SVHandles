@@ -26,6 +26,8 @@ internal static class SceneViewHandles
         // Load the types via reflection, because I'm a lazy dev who doesn't like typing out stuff.
         // (Not to mention it makes the end-user experience smooth as hell)
         LoadDisplaysViaReflection();
+
+        LoadPrefs();
     }
 
     private static void OnSceneGUI(SceneView sceneView)
