@@ -166,7 +166,7 @@ internal static class SceneViewHandles
             Type monoType = mono.GetType();
 
             // See if this component has any fields with our attribute
-            FieldInfo[] fields = monoType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            FieldInfo[] fields = monoType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
             bool hasDebugAttrib = fields.Any(field => Attribute.GetCustomAttribute(field, typeof(SVDebug)) is SVDebug || Attribute.GetCustomAttribute(field, typeof(SVHandle)) is SVHandle);
             if (!hasDebugAttrib)

@@ -6,14 +6,20 @@ using UnityEngine;
 /// <summary>
 /// Attribute used to draw debug information in scene view.
 /// </summary>
-[AttributeUsage(AttributeTargets.Field)]
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 public class SVHandle : Attribute
 {
     public Color Color;
+    public SVArgss args;
 
     public SVHandle()
     {
         Color = Color.white;
+    }
+
+    public SVHandle(SVArgss args)
+    {
+        this.args = args;
     }
 
     public SVHandle(float r, float g, float b)
@@ -25,4 +31,9 @@ public class SVHandle : Attribute
     {
         Color = new Color(r, g, b, a);
     }
+}
+
+public class SVArgss
+{
+
 }
