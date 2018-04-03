@@ -6,18 +6,17 @@ using UnityEngine;
 
 namespace SVHandles.Displays.Handle
 {
-    public class Vector3IntArrayHandleDisplay : ITypeHandleDisplay
+    public class Vector3IntArrayHandleDisplay : SVHandleDisplay
     {
-        public Type ExecutingType
+        public override Type ExecutingType
         {
             get { return typeof(Vector3Int[]); }
         }
 
-        public object Draw(SVArgs args)
+        public override void Draw(SVArgs args, ref object value)
         {
-            Vector3Int[] inPoints = args.Value as Vector3Int[];
+            Vector3Int[] inPoints = value as Vector3Int[];
 
-            EditorGUI.BeginChangeCheck();
             for (int i = 0; i < inPoints.Length; i++)
             {
                 if (SceneViewHandles.DoFade(inPoints[i]))
@@ -25,10 +24,7 @@ namespace SVHandles.Displays.Handle
                 inPoints[i] = Vector3Int.RoundToInt(Handles.DoPositionHandle(inPoints[i], Quaternion.identity));
             }
 
-            if (EditorGUI.EndChangeCheck())
-                return (object)inPoints;
-            else
-                return null;
+            value = inPoints;
         }
     }
 }

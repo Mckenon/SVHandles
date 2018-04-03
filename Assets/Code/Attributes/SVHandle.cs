@@ -10,16 +10,16 @@ using UnityEngine;
 public class SVHandle : Attribute
 {
     public Color Color;
-    public SVArgss args;
+    public Type Type = null;
 
     public SVHandle()
     {
         Color = Color.white;
     }
 
-    public SVHandle(SVArgss args)
+    public SVHandle(Type type)
     {
-        this.args = args;
+        Type = type;
     }
 
     public SVHandle(float r, float g, float b)
@@ -31,9 +31,4 @@ public class SVHandle : Attribute
     {
         Color = new Color(r, g, b, a);
     }
-}
-
-public class SVArgss
-{
-
 }

@@ -6,23 +6,21 @@ using UnityEngine;
 
 namespace SVHandles.Displays.Handle
 {
-    public class Vector3HandleDisplay : ITypeHandleDisplay
+    public class Vector3HandleDisplay : SVHandleDisplay
     {
-        public Type ExecutingType
+        public override Type ExecutingType
         {
             get { return typeof(Vector3); }
         }
 
-        public object Draw(SVArgs args)
+        public override void Draw(SVArgs args, ref object value)
         {
-            Vector3 inPoint = (args.Value as Vector3?).GetValueOrDefault();
+            Vector3 inPoint = (value as Vector3?).GetValueOrDefault();
 
             if (SceneViewHandles.DoFade(inPoint))
-                return null;
+                return;
 
-            Vector3 outPoint = Handles.DoPositionHandle(inPoint, Quaternion.identity);
-
-            return (outPoint != inPoint) ? (object)outPoint : null;
+            value = Handles.DoPositionHandle(inPoint, Quaternion.identity);
         }
     }
 }

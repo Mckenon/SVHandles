@@ -8,22 +8,22 @@ using UnityEngine;
 
 namespace SVHandles.Displays.Handle
 {
-    public class BoundsHandleDisplay : ITypeHandleDisplay
+    public class BoundsHandleDisplay : SVHandleDisplay
     {
-        public Type ExecutingType
+        public override Type ExecutingType
         {
             get { return typeof(Bounds); }
         }
 
-        public object Draw(SVArgs args)
+        public override void Draw(SVArgs args, ref object value)
         {
             Transform t = args.MonoInstance.transform;
 
-            Bounds inBounds = (args.Value as Bounds?).GetValueOrDefault();
+            Bounds inBounds = (value as Bounds?).GetValueOrDefault();
             Bounds outBounds = inBounds;
 
             if (SceneViewHandles.DoFade(t.TransformPoint(inBounds.center)))
-                return null;
+                return;
 
             outBounds.center = t.InverseTransformPoint(Handles.DoPositionHandle(t.TransformPoint(inBounds.center), Quaternion.identity));
             //outBounds.size = Handles.DoScaleHandle(inBounds.size, t.TransformPoint(outBounds.center), Quaternion.identity, 1f);
@@ -53,7 +53,7 @@ namespace SVHandles.Displays.Handle
 
             Handles.DrawWireCube(t.TransformPoint(outBounds.center), outBounds.size);
 
-            return (outBounds != inBounds) ? (object)outBounds : null;
+            value = outBounds;
         }
     }
 }

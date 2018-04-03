@@ -6,16 +6,16 @@ using UnityEngine;
 
 namespace SVHandles.Displays
 {
-    public class Vector3DebugDisplay : ITypeDebugDisplay
+    public class Vector3DebugDisplay : SVHandleDisplay
     {
-        public Type ExecutingType
+        public override Type ExecutingType
         {
             get { return typeof(Vector3); }
         }
 
-        public void Draw(SVArgs args)
+        public override void Draw(SVArgs args, ref object value)
         {
-            Vector3? mVec = args.Value as Vector3?;
+            Vector3? mVec = value as Vector3?;
 
             if (mVec == null)
                 return;

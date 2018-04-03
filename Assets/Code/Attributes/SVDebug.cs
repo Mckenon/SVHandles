@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
+/*
 /// <summary>
 /// Attribute used to draw debug information in scene view.
 /// </summary>
@@ -24,3 +25,4 @@ public class SVDebug : Attribute
         Color = new Color(r, g, b, a);
     }
 }
+*/
