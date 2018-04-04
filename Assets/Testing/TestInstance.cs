@@ -22,4 +22,5 @@ public class TestInstance : MonoBehaviour
     };
 
     [SVHandle] public Bounds MyBounds = new Bounds(Vector3.zero, Vector3.one);
+
 }
