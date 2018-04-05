@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class TestInstance : MonoBehaviour
 {
+    [SVHandle] public Vector3 MyVector = new Vector3(0,0,0);
+
     [SVHandle]
     private Vector3[] Testa = new Vector3[]
     {

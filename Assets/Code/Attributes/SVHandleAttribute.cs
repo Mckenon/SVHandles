@@ -12,6 +12,8 @@ public class SVHandleAttribute : Attribute
     public Color Color;
     public Type Type = null;
 
+    public bool MyBool = false;
+
     public SVHandleAttribute()
     {
         Color = Color.white;

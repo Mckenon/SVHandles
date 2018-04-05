@@ -12,8 +12,9 @@ internal static class SceneViewHandles
 {
     private const float UPDATE_TIME = 5f;                               // Value used to periodically update our attributes.
     private static float t = 0f;                                        // Value used to keep track of time between updates.
-    private static List<MonoAttributeCollection> attributes;                  // A list of attribute instances we keep cached for re-use.
+    private static List<MonoAttributeCollection> attributes;            // A list of attribute instances we keep cached for re-use.
     private static Dictionary<Type, Dictionary<Type, SVHandleDisplay>> handleDisplays;
+    private static List<Type> preCheckedTypes;                         // A list of known types which use our attribute.
 
     [InitializeOnLoadMethod]
     private static void Init()
@@ -26,6 +27,7 @@ internal static class SceneViewHandles
         // Load the types via reflection, because I'm a lazy dev who doesn't like typing out stuff.
         // (Not to mention it makes the end-user experience smooth as hell)
         LoadDisplaysViaReflection();
+        PreCheckTypesViaReflection();
 
         LoadPrefs();
     }
@@ -140,7 +142,11 @@ internal static class SceneViewHandles
         if (attributes == null)
             attributes = new List<MonoAttributeCollection>();
 
-        MonoBehaviour[] activeScene = Object.FindObjectsOfType<MonoBehaviour>();
+        List<MonoBehaviour> activeScene = new List<MonoBehaviour>();
+
+        foreach (var type in preCheckedTypes)
+            activeScene.AddRange(Object.FindObjectsOfType(type).AsEnumerable() as IEnumerable<MonoBehaviour>);
+
         foreach (MonoBehaviour mono in activeScene)
         {
             Type monoType = mono.GetType();
@@ -222,6 +228,27 @@ internal static class SceneViewHandles
             else
                 handleDisplays.Add(hd.ExecutingType, new Dictionary<Type, SVHandleDisplay>(){{hd.GetType(), hd}});
         }
+    }
+
+    /// <summary>
+    /// Loops through all classes in all assemblies, checking to see if there are any
+    /// variables which have an [SVHandle] attribute. If so, add the type to a
+    /// list. This way we don't pull all MonoBehaviour instances, but instead only
+    /// pull from any known type to have our attribute.
+    /// </summary>
+    private static void PreCheckTypesViaReflection()
+    {
+        if (preCheckedTypes == null)
+            preCheckedTypes = new List<Type>();
+        else
+            preCheckedTypes.Clear();
+
+        IEnumerable<Type> kAT = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(t => t.GetTypes())
+            .Where(t => t.IsClass && typeof(MonoBehaviour).IsAssignableFrom(t))
+            .Where(t => t.GetFields().Any(f => Attribute.GetCustomAttribute(f, typeof(SVHandleAttribute)) is SVHandleAttribute));
+
+        preCheckedTypes = kAT.ToList();
     }
 
     #region Utilities
