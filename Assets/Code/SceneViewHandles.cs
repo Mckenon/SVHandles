@@ -148,7 +148,7 @@ internal static class SceneViewHandles
             // See if this component has any fields with our attribute
             FieldInfo[] fields = monoType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-            bool hasHandleAttribute = fields.Any(field => Attribute.GetCustomAttribute(field, typeof(SVHandle)) is SVHandle);
+            bool hasHandleAttribute = fields.Any(field => Attribute.GetCustomAttribute(field, typeof(SVHandleAttribute)) is SVHandleAttribute);
             if (!hasHandleAttribute)
                 continue;
 
@@ -157,11 +157,11 @@ internal static class SceneViewHandles
 
             foreach (var field in fields)
             {
-                SVHandle svHandleAttrib = Attribute.GetCustomAttribute(field, typeof(SVHandle)) as SVHandle;
+                SVHandleAttribute svHandleAttributeAttrib = Attribute.GetCustomAttribute(field, typeof(SVHandleAttribute)) as SVHandleAttribute;
 
-                if(svHandleAttrib != null)
+                if(svHandleAttributeAttrib != null)
                     if (!attrib.SVHandles.ContainsKey(field))
-                        attrib.SVHandles.Add(field, svHandleAttrib);
+                        attrib.SVHandles.Add(field, svHandleAttributeAttrib);
             }
         }
     }
@@ -190,12 +190,12 @@ internal static class SceneViewHandles
     private class MonoAttributeCollection
     {
         public MonoBehaviour MonoInstance;
-        public Dictionary<FieldInfo, SVHandle> SVHandles;
+        public Dictionary<FieldInfo, SVHandleAttribute> SVHandles;
 
         public MonoAttributeCollection(MonoBehaviour mono)
         {
             MonoInstance = mono;
-            SVHandles = new Dictionary<FieldInfo, SVHandle>();
+            SVHandles = new Dictionary<FieldInfo, SVHandleAttribute>();
         }
     }
 
