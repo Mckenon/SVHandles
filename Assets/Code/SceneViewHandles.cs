@@ -86,7 +86,21 @@ internal static class SceneViewHandles
                     if (kvPair.Value.Type != null)
                         handleDisplays[type][kvPair.Value.Type].Draw(args, ref value);
                     else
-                        handleDisplays[type].OrderByDescending(t => t.Value.Priority).First().Value.Draw(args, ref value);
+                    {
+                        SVHandleDisplay currentDisp = null;
+                        using (var e = handleDisplays[type].Values.GetEnumerator())
+                        {
+                            while (e.MoveNext())
+                            {
+                                if (currentDisp == null || e.Current.Priority > currentDisp.Priority)
+                                    currentDisp = e.Current;
+                                e.MoveNext();
+                            }
+                        }
+
+                        if (currentDisp != null)
+                            currentDisp.Draw(args, ref value);
+                    }
                 }
                 if (EditorGUI.EndChangeCheck())
                     kvPair.Key.SetValue(attrib.MonoInstance, value);
