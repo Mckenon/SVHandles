@@ -1,4 +1,4 @@
-# Scene View Handles
+![Scene View Handles](https://i.imgur.com/J9GrgTv.png)
 SVHandles is a lightweight extension for Unity which allows you to quickly visualize and modify variables such as Vector3 and Bounds by simply adding ``[SVHandle]`` to the variable, and nothing else.
 
 ## SVHandle Example
