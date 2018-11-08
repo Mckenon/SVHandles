@@ -273,7 +273,8 @@ internal static class SceneViewHandles
     /// <param name="position"></param>
     /// <returns>If the object is completely faded out, if so it is recommended that you just return.</returns>
     public static bool DoFade(Vector3 position)
-    {
+	{
+		return false;
         Color c = Handles.color;
         float actualDist = Vector3.Distance(SceneView.currentDrawingSceneView.camera.transform.position, position);
         float value = actualDist / fadeDistance;

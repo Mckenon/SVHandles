@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class TestInstance : MonoBehaviour
 {
-    [SVHandle] public Vector3 MyVector = new Vector3(0,0,0);
+    [SVHandle(typeof(Vector3HandleDisplay))]
+	public Vector3 MyVector = new Vector3(0,0,0);
 
+	/*
     [SVHandle]
     private Vector3[] Testa = new Vector3[]
     {
@@ -24,5 +26,6 @@ public class TestInstance : MonoBehaviour
     };
 
     [SVHandle(1f, 0f, 0f)] public Bounds MyBounds = new Bounds(Vector3.zero, Vector3.one);
+	*/
 
 }
