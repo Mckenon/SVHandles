@@ -14,7 +14,7 @@ internal static class SceneViewHandles
     private static float t = 0f;                                        // Value used to keep track of time between updates.
     private static List<MonoAttributeCollection> attributes;            // A list of attribute instances we keep cached for re-use.
     private static Dictionary<Type, Dictionary<Type, SVHandleDisplay>> handleDisplays;
-    private static List<Type> preCheckedTypes;                         // A list of known types which use our attribute.
+    private static List<Type> preCheckedTypes;							// A list of known types which use our attribute.
 
     [InitializeOnLoadMethod]
     private static void Init()
@@ -24,8 +24,7 @@ internal static class SceneViewHandles
         EditorApplication.hierarchyWindowChanged += OnHierarchyChanged;
         EditorApplication.playModeStateChanged += OnPlayStateChanged;
 
-        // Load the types via reflection, because I'm a lazy dev who doesn't like typing out stuff.
-        // (Not to mention it makes the end-user experience smooth as hell)
+        // Load the types via reflection, as this was the best way to get a smooth end-user experience.
         LoadDisplaysViaReflection();
         PreCheckTypesViaReflection();
 
@@ -37,36 +36,32 @@ internal static class SceneViewHandles
         if (attributes == null)
             SweepForComponents();
 
+        Color cachedHandlesColor = Handles.color;
+
         for(int i = attributes.Count; i --> 0;)
         {
-            var attrib = attributes[i];
+            MonoAttributeCollection attribute = attributes[i];
 
             // If there is no mono instance, assume our component has been removed.
-            if (attrib.MonoInstance == null)
+            if (attribute.MonoInstance == null)
             {
-                attributes.Remove(attrib);
+                attributes.Remove(attribute);
                 continue;
             }
 
             if(displayMode == DisplayMode.SelectedObject)
-                if (!Selection.Contains(attrib.MonoInstance.gameObject))
+                if (!Selection.Contains(attribute.MonoInstance.gameObject))
                     continue;
-
-            // TODO - Do something to make this not be mostly two copied code blocks.
-
-            Color cachedColor = Handles.color;
-
-            Handles.color = cachedColor;
-
+			
             // Draw our SVDebugs
-            foreach (var kvPair in attrib.SVHandles)
+            foreach (var kvPair in attribute.SVHandles)
             {
-                object value = kvPair.Key.GetValue(attrib.MonoInstance);
+                object value = kvPair.Key.GetValue(attribute.MonoInstance);
                 Type type = kvPair.Key.FieldType;
 
                 if (value == null)
                 {
-                    attributes.Remove(attrib);
+                    attributes.Remove(attribute);
                     break;
                 }
 
@@ -76,9 +71,9 @@ internal static class SceneViewHandles
                     continue;
                 }
 
-                SVArgs args = new SVArgs(value, attrib.MonoInstance);
+                SVArgs args = new SVArgs(value, attribute.MonoInstance);
 
-                Handles.color = attrib.SVHandles[kvPair.Key].Color;
+                Handles.color = attribute.SVHandles[kvPair.Key].Color;
 
                 EditorGUI.BeginChangeCheck();
                 {
@@ -103,17 +98,17 @@ internal static class SceneViewHandles
                     }
                 }
                 if (EditorGUI.EndChangeCheck())
-                    kvPair.Key.SetValue(attrib.MonoInstance, value);
+                    kvPair.Key.SetValue(attribute.MonoInstance, value);
             }
-
-            Handles.color = cachedColor;
         }
-    }
+
+        Handles.color = cachedHandlesColor;
+	}
 
     private static void Update()
     {
         // Do the logic for our periodic update.
-        // This update isn't really necessary, and is only here as a precaution in case something bad happens.
+        // This is a requirement because from time to time Unity doesn't seem to trigger callbacks correctly
         t += Time.unscaledDeltaTime;
         if (t > UPDATE_TIME)
         {
@@ -175,7 +170,7 @@ internal static class SceneViewHandles
             // If we haven't exited by this point, we know there is atleast one field with our attribute.
             MonoAttributeCollection attrib = GetOrCreateAttributeCollection(mono);
 
-            foreach (var field in fields)
+            foreach (FieldInfo field in fields)
             {
                 SVHandleAttribute svHandleAttributeAttrib = Attribute.GetCustomAttribute(field, typeof(SVHandleAttribute)) as SVHandleAttribute;
 
