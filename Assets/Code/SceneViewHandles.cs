@@ -15,6 +15,7 @@ internal static class SceneViewHandles
     private static List<MonoAttributeCollection> attributes;            // A list of attribute instances we keep cached for re-use.
     private static Dictionary<Type, Dictionary<Type, SVHandleDisplay>> handleDisplays;
     private static List<Type> preCheckedTypes;							// A list of known types which use our attribute.
+    private static List<MonoBehaviour> activeSceneBuffer;
 
     [InitializeOnLoadMethod]
     private static void Init()
@@ -150,13 +151,15 @@ internal static class SceneViewHandles
     {
         if (attributes == null)
             attributes = new List<MonoAttributeCollection>();
+        if (activeSceneBuffer == null)
+	        activeSceneBuffer = new List<MonoBehaviour>();
 
-        List<MonoBehaviour> activeScene = new List<MonoBehaviour>();
+        activeSceneBuffer.Clear();
 
         foreach (var type in preCheckedTypes)
-            activeScene.AddRange(Object.FindObjectsOfType(type).AsEnumerable() as IEnumerable<MonoBehaviour>);
+	        activeSceneBuffer.AddRange(Object.FindObjectsOfType(type).AsEnumerable() as IEnumerable<MonoBehaviour>);
 
-        foreach (MonoBehaviour mono in activeScene)
+        foreach (MonoBehaviour mono in activeSceneBuffer)
         {
             Type monoType = mono.GetType();
 
