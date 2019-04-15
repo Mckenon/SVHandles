@@ -10,11 +10,11 @@ using Object = UnityEngine.Object;
 
 internal static class SceneViewHandles
 {
-    private const float UPDATE_TIME = 5f;                               // Value used to periodically update our attributes.
-    private static float t = 0f;                                        // Value used to keep track of time between updates.
-    private static List<MonoAttributeCollection> attributes;            // A list of attribute instances we keep cached for re-use.
+    private const float UPDATE_TIME = 5f;	// Amount of time between periodic re-scanning of the scene for newly changed components.
+    private static float t = 0f;
+    private static List<MonoAttributeCollection> attributes;
     private static Dictionary<Type, Dictionary<Type, SVHandleDisplay>> handleDisplays;
-    private static List<Type> preCheckedTypes;							// A list of known types which use our attribute.
+    private static List<Type> preCheckedTypes;
     private static List<MonoBehaviour> activeSceneBuffer;
 
     [InitializeOnLoadMethod]
@@ -39,7 +39,7 @@ internal static class SceneViewHandles
 
         Color cachedHandlesColor = Handles.color;
 
-        for(int i = attributes.Count; i --> 0;)
+        for(int i = attributes.Count; i >= 0; i--)
         {
             MonoAttributeCollection attribute = attributes[i];
 
@@ -50,8 +50,7 @@ internal static class SceneViewHandles
                 continue;
             }
 
-            if(displayMode == DisplayMode.SelectedObject)
-                if (!Selection.Contains(attribute.MonoInstance.gameObject))
+            if(displayMode == DisplayMode.SelectedObject && !Selection.Contains(attribute.MonoInstance.gameObject))
                     continue;
 			
             // Draw our SVDebugs
@@ -177,10 +176,12 @@ internal static class SceneViewHandles
             {
                 SVHandleAttribute svHandleAttributeAttrib = Attribute.GetCustomAttribute(field, typeof(SVHandleAttribute)) as SVHandleAttribute;
 
-                if(svHandleAttributeAttrib != null)
-                    if (!attrib.SVHandles.ContainsKey(field))
-                        attrib.SVHandles.Add(field, svHandleAttributeAttrib);
-            }
+				if (svHandleAttributeAttrib == null)
+					continue;
+				if (attrib.SVHandles.ContainsKey(field))
+					continue;
+				attrib.SVHandles.Add(field, svHandleAttributeAttrib);
+			}
         }
     }
 
@@ -192,12 +193,15 @@ internal static class SceneViewHandles
     /// <returns></returns>
     private static MonoAttributeCollection GetOrCreateAttributeCollection(MonoBehaviour mono)
     {
-        foreach(var attrib in attributes)
-            if (attrib.MonoInstance == mono)
-                return attrib;
-        var newAttrib = new MonoAttributeCollection(mono);
-        attributes.Add(newAttrib);
-        return newAttrib;
+		foreach (var attribute in attributes)
+		{
+			if (attribute.MonoInstance == mono)
+				return attribute;
+		}
+
+		var attributeCollection = new MonoAttributeCollection(mono);
+        attributes.Add(attributeCollection);
+        return attributeCollection;
     }
 
     /// <summary>
@@ -228,6 +232,7 @@ internal static class SceneViewHandles
         else
             handleDisplays.Clear();
 
+		// TODO - Convert to alternative as LINQ isn't necessary here.
         IEnumerable<SVHandleDisplay> hDisplays= AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(t => t.GetTypes())
             .Where(t => t.IsClass && typeof(SVHandleDisplay).IsAssignableFrom(t) && t != typeof(SVHandleDisplay))
@@ -296,7 +301,6 @@ internal static class SceneViewHandles
         if (!prefsLoaded)
         {
             LoadPrefs();
-            prefsLoaded = true;
         }
 
         fadeDistance = EditorGUILayout.Slider("Fade Distance", fadeDistance, 0f, 50f);
@@ -316,6 +320,8 @@ internal static class SceneViewHandles
     {
         fadeDistance = EditorPrefs.GetFloat("SV_FadeDistance");
         displayMode = (DisplayMode) EditorPrefs.GetInt("SV_DisplayMode");
+		
+		prefsLoaded = true;
     }
 
     private static void SavePrefs()
